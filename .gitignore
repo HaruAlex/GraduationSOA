@@ -1,0 +1,25 @@
+# Play / sbt
+target/
+project/target/
+project/project/
+.bsp/
+.metals/
+
+# IDE
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+/.metadata/
