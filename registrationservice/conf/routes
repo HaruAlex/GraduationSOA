@@ -1,6 +1,17 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
+# Registration API
+
+GET     /api/registrations                  controllers.RegistrationController.getAll()
+POST    /api/registrations                  controllers.RegistrationController.create(request: Request)
+DELETE  /api/registrations/:maSV/:maDT      controllers.RegistrationController.delete(maSV: String, maDT: String)
+
+# Home
+GET     /                                   controllers.HomeController.index()
+
+# Static resources
+GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
