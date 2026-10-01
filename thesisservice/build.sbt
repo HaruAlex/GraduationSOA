@@ -7,4 +7,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.13.18"
 
-libraryDependencies += guice
+libraryDependencies ++= Seq(
+  guice,
+  javaJdbc,
+  "com.microsoft.sqlserver" % "mssql-jdbc" % "12.8.1.jre11"
+)
