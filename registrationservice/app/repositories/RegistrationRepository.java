@@ -14,7 +14,7 @@ public class RegistrationRepository {
     "jdbc:sqlserver://localhost:1433;" +
     "databaseName=GraduationSOA;" +
     "user=sa;" +
-    "password=22032005;" +
+    "password=123456;" +
     "encrypt=true;" +
     "trustServerCertificate=true";
 
