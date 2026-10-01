@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đề tài</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">← Trang chủ</a>
+        <h1>Quản lý Đề tài</h1>
+        <span class="header-badge">ThesisService :9002</span>
+    </header>
+
+    <main>
+        <section class="card">
+
+            <!-- FORM -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Mã đề tài <span class="required">*</span></label>
+                    <input type="text" id="maDT" placeholder="VD: DT001">
+                </div>
+                <div class="form-group">
+                    <label>Tên đề tài <span class="required">*</span></label>
+                    <input type="text" id="tenDT" placeholder="VD: Xây dựng hệ thống...">
+                </div>
+                <div class="form-group">
+                    <label>Giảng viên</label>
+                    <input type="text" id="giangVien" placeholder="VD: Nguyễn Văn B">
+                </div>
+                <div class="form-group">
+                    <label>Số lượng tối đa <span class="required">*</span></label>
+                    <input type="number" id="soLuongToiDa" placeholder="VD: 5" min="1">
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="buttons">
+                <button class="btn-primary" onclick="themDeTai()">➕ Thêm</button>
+                <button class="btn-warning" onclick="suaDeTai()">✏️ Sửa</button>
+                <button class="btn-danger" onclick="xoaDeTai()">🗑️ Xóa</button>
+                <button class="btn-secondary" onclick="loadDeTai()">🔄 Tải danh sách</button>
+                <button class="btn-secondary" onclick="xoaForm()">✖ Xóa form</button>
+            </div>
+
+            <!-- THÔNG BÁO -->
+            <div id="message"></div>
+
+            <!-- TABLE -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã ĐT</th>
+                            <th>Tên đề tài</th>
+                            <th>Giảng viên</th>
+                            <th>Số lượng tối đa</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="thesisTable">
+                        <tr>
+                            <td colspan="5" class="empty-row">Nhấn "Tải danh sách" để xem dữ liệu</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        const API = 'http://localhost:9002/api/theses';
+
+        function selectRow(maDT, tenDT, giangVien, soLuongToiDa) {
+            document.getElementById('maDT').value = maDT;
+            document.getElementById('tenDT').value = tenDT;
+            document.getElementById('giangVien').value = giangVien;
+            document.getElementById('soLuongToiDa').value = soLuongToiDa;
+            showMessage('Đã chọn đề tài: ' + maDT, 'info');
+        }
+
+        function xoaForm() {
+            document.getElementById('maDT').value = '';
+            document.getElementById('tenDT').value = '';
+            document.getElementById('giangVien').value = '';
+            document.getElementById('soLuongToiDa').value = '';
+            clearMessage();
+        }
+
+        function showMessage(msg, type = 'success') {
+            const el = document.getElementById('message');
+            el.textContent = msg;
+            el.className = 'message ' + type;
+        }
+
+        function clearMessage() {
+            const el = document.getElementById('message');
+            el.textContent = '';
+            el.className = 'message';
+        }
+
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderTable(theses) {
+            const tbody = document.getElementById('thesisTable');
+            if (!theses || theses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Không có dữ liệu</td></tr>';
+                return;
+            }
+            tbody.innerHTML = theses.map(dt => `
+                <tr onclick="selectRow('${dt.maDT}','${escHtml(dt.tenDT)}','${escHtml(dt.giangVien || '')}',${dt.soLuongToiDa})">
+                    <td>${escHtml(dt.maDT)}</td>
+                    <td>${escHtml(dt.tenDT)}</td>
+                    <td>${escHtml(dt.giangVien || '')}</td>
+                    <td>${dt.soLuongToiDa}</td>
+                    <td>
+                        <button class="btn-danger btn-sm" onclick="event.stopPropagation(); xoaNhanh('${dt.maDT}')">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadDeTai() {
+            try {
+                const res = await fetch(API);
+                const data = await res.json();
+                renderTable(data);
+                showMessage('Đã tải ' + data.length + ' đề tài', 'success');
+            } catch (err) {
+                showMessage('Lỗi kết nối ThesisService (:9002): ' + err.message, 'error');
+            }
+        }
+
+        async function themDeTai() {
+            const maDT         = document.getElementById('maDT').value.trim();
+            const tenDT        = document.getElementById('tenDT').value.trim();
+            const giangVien    = document.getElementById('giangVien').value.trim();
+            const soLuongToiDa = parseInt(document.getElementById('soLuongToiDa').value);
+
+            if (!maDT || !tenDT) {
+                showMessage('Mã đề tài và tên đề tài không được để trống', 'error');
+                return;
+            }
+            if (!soLuongToiDa || soLuongToiDa <= 0) {
+                showMessage('Số lượng tối đa phải lớn hơn 0', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ maDT, tenDT, giangVien, soLuongToiDa })
+                });
+                const data = await res.json();
+
+                if (res.status === 201) {
+                    showMessage('Thêm đề tài ' + maDT + ' thành công!', 'success');
+                    xoaForm();
+                    loadDeTai();
+                } else {
+                    showMessage(data.message || 'Lỗi: ' + res.status, 'error');
+                }
+            } catch (err) {
+                showMessage('Lỗi kết nối: ' + err.message, 'error');
+            }
+        }
+
+        async function suaDeTai() {
+            const maDT         = document.getElementById('maDT').value.trim();
+            const tenDT        = document.getElementById('tenDT').value.trim();
+            const giangVien    = document.getElementById('giangVien').value.trim();
+            const soLuongToiDa = parseInt(document.getElementById('soLuongToiDa').value);
+
+            if (!maDT || !tenDT) {
+                showMessage('Chọn đề tài và nhập tên để sửa', 'error');
+                return;
+            }
+            if (!soLuongToiDa || soLuongToiDa <= 0) {
+                showMessage('Số lượng tối đa phải lớn hơn 0', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API + '/' + maDT, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tenDT, giangVien, soLuongToiDa })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showMessage('Cập nhật đề tài ' + maDT + ' thành công!', 'success');
+                    loadDeTai();
+                } else {
+                    showMessage(data.message || 'Lỗi: ' + res.status, 'error');
+                }
+            } catch (err) {
+                showMessage('Lỗi kết nối: ' + err.message, 'error');
+            }
+        }
+
+        async function xoaDeTai() {
+            const maDT = document.getElementById('maDT').value.trim();
+            if (!maDT) {
+                showMessage('Chọn đề tài cần xóa', 'error');
+                return;
+            }
+            if (!confirm('Xác nhận xóa đề tài ' + maDT + '?')) return;
+
+            try {
+                const res = await fetch(API + '/' + maDT, { method: 'DELETE' });
+
+                // DELETE trả về 204 No Content → không có body
+                if (res.status === 204 || res.ok) {
+                    showMessage('Đã xóa đề tài ' + maDT, 'success');
+                    xoaForm();
+                    loadDeTai();
+                } else {
+                    const data = await res.json();
+                    showMessage(data.message || 'Lỗi: ' + res.status, 'error');
+                }
+            } catch (err) {
+                showMessage('Lỗi kết nối: ' + err.message, 'error');
+            }
+        }
+
+        async function xoaNhanh(maDT) {
+            if (!confirm('Xác nhận xóa đề tài ' + maDT + '?')) return;
+            try {
+                const res = await fetch(API + '/' + maDT, { method: 'DELETE' });
+                if (res.status === 204 || res.ok) {
+                    showMessage('Đã xóa đề tài ' + maDT, 'success');
+                    loadDeTai();
+                } else {
+                    const data = await res.json();
+                    showMessage(data.message || 'Lỗi: ' + res.status, 'error');
+                }
+            } catch (err) {
+                showMessage('Lỗi kết nối: ' + err.message, 'error');
+            }
+        }
+
+        // Tải danh sách ngay khi mở trang
+        loadDeTai();
+    </script>
+
+</body>
+</html>

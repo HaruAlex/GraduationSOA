@@ -4,121 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý đồ án tốt nghiệp</title>
-
     <link rel="stylesheet" href="../css/style.css">
 </head>
-
 <body>
 
     <header>
         <h1>HỆ THỐNG QUẢN LÝ ĐỒ ÁN TỐT NGHIỆP</h1>
+        <p class="subtitle">Chọn chức năng bên dưới để bắt đầu</p>
     </header>
 
-    <main>
+    <main class="home-grid">
 
-        <!-- QUẢN LÝ SINH VIÊN -->
-        <section class="card">
-            <h2>Quản lý sinh viên</h2>
+        <a href="students.html" class="home-card">
+            <div class="home-card-icon">👨‍🎓</div>
+            <h2>Quản lý Sinh viên</h2>
+            <p>Thêm, sửa, xóa và tra cứu thông tin sinh viên</p>
+            <span class="badge">:9001</span>
+        </a>
 
-            <div class="form">
-                <input type="text" id="maSV" placeholder="Mã sinh viên">
-                <input type="text" id="hoTen" placeholder="Họ tên">
-                <input type="email" id="email" placeholder="Email">
-                <input type="text" id="lop" placeholder="Lớp">
-            </div>
+        <a href="theses.html" class="home-card">
+            <div class="home-card-icon">📚</div>
+            <h2>Quản lý Đề tài</h2>
+            <p>Thêm, sửa, xóa và tra cứu đề tài tốt nghiệp</p>
+            <span class="badge">:9002</span>
+        </a>
 
-            <div class="buttons">
-                <button onclick="themSinhVien()">Thêm</button>
-                <button onclick="suaSinhVien()">Sửa</button>
-                <button onclick="xoaSinhVien()">Xóa</button>
-                <button onclick="loadSinhVien()">Tải danh sách</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã SV</th>
-                        <th>Họ tên</th>
-                        <th>Email</th>
-                        <th>Lớp</th>
-                    </tr>
-                </thead>
-
-                <tbody id="studentTable">
-                </tbody>
-            </table>
-        </section>
-
-
-        <!-- QUẢN LÝ ĐỀ TÀI -->
-        <section class="card">
-            <h2>Quản lý đề tài</h2>
-
-            <div class="form">
-                <input type="text" id="maDT" placeholder="Mã đề tài">
-                <input type="text" id="tenDT" placeholder="Tên đề tài">
-                <input type="text" id="giangVien" placeholder="Giảng viên">
-                <input type="number" id="soLuongToiDa" placeholder="Số lượng tối đa">
-            </div>
-
-            <div class="buttons">
-                <button onclick="themDeTai()">Thêm</button>
-                <button onclick="suaDeTai()">Sửa</button>
-                <button onclick="xoaDeTai()">Xóa</button>
-                <button onclick="loadDeTai()">Tải danh sách</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã ĐT</th>
-                        <th>Tên đề tài</th>
-                        <th>Giảng viên</th>
-                        <th>Số lượng tối đa</th>
-                    </tr>
-                </thead>
-
-                <tbody id="thesisTable">
-                </tbody>
-            </table>
-        </section>
-
-
-        <!-- ĐĂNG KÝ ĐỀ TÀI -->
-        <section class="card">
-            <h2>Đăng ký đề tài</h2>
-
-            <div class="form">
-                <input type="text" id="regMaSV" placeholder="Mã sinh viên">
-                <input type="text" id="regMaDT" placeholder="Mã đề tài">
-            </div>
-
-            <div class="buttons">
-                <button onclick="dangKy()">Đăng ký</button>
-                <button onclick="loadDangKy()">Tải danh sách đăng ký</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã SV</th>
-                        <th>Mã ĐT</th>
-                        <th>Ngày đăng ký</th>
-                    </tr>
-                </thead>
-
-                <tbody id="registrationTable">
-                </tbody>
-            </table>
-        </section>
-
-
-        <!-- THÔNG BÁO -->
-        <div id="message"></div>
+        <a href="registrations.html" class="home-card">
+            <div class="home-card-icon">📝</div>
+            <h2>Đăng ký Đề tài</h2>
+            <p>Đăng ký và hủy đăng ký đề tài cho sinh viên</p>
+            <span class="badge">:9003</span>
+        </a>
 
     </main>
-
-    <script src="../js/script.js"></script>
 
 </body>
 </html>
