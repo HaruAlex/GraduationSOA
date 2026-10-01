@@ -11,9 +11,15 @@ import services.ThesisService;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ThesisController extends Controller {
 
-    private final ThesisService service = new ThesisService();
+	private final ThesisService service;
+	@Inject
+    public ThesisController(ThesisService service) {
+        this.service = service;
+    }
 
     public Result getAll() {
         try {

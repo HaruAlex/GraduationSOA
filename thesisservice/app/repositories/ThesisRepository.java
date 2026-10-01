@@ -1,22 +1,25 @@
 package repositories;
 
 import models.Thesis;
+import play.db.Database;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Singleton
 public class ThesisRepository {
+	private final Database db;
 
-    private static final String URL =
-    "jdbc:sqlserver://localhost:1433;databaseName=GraduationSOA;encrypt=true;trustServerCertificate=true";
-
-private static final String USER = "sa";
-
-private static final String PASSWORD = "Xuanthuđê";
-
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    @Inject
+    public ThesisRepository(Database db) {
+        this.db = db;
+    }
+ // Lấy connection trực tiếp từ Connection Pool của Play Framework
+    private Connection getConnection() {
+        return db.getConnection();
     }
 
     public List<Thesis> findAll() throws SQLException {
