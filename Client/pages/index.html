@@ -3,40 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý đồ án tốt nghiệp</title>
+    <title>Hệ thống quản lý đồ án tốt nghiệp</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e0e0e0;
+        }
+
+        .index-header {
+            background: #2c2c3e;
+            color: #fff;
+            text-align: center;
+            padding: 22px 20px;
+        }
+
+        .index-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+            letter-spacing: 1px;
+        }
+
+        .index-header p {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.85;
+        }
+
+        .index-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .index-card {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            text-decoration: none;
+            color: #1f2937;
+            transition: transform .2s, box-shadow .2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .index-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.15);
+        }
+
+        .index-card-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .index-card-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: #333;
+        }
+
+        .index-card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #1f2937;
+        }
+
+        .index-card p {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .index-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin: 40px auto;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <header>
+    <div class="index-header">
         <h1>HỆ THỐNG QUẢN LÝ ĐỒ ÁN TỐT NGHIỆP</h1>
-        <p class="subtitle">Chọn chức năng bên dưới để bắt đầu</p>
-    </header>
+        <p>Chọn chức năng bên dưới để bắt đầu</p>
+    </div>
 
-    <main class="home-grid">
-
-        <a href="students.html" class="home-card">
-            <div class="home-card-icon">👨‍🎓</div>
+    <div class="index-container">
+        
+        <!-- QUẢN LÝ SINH VIÊN -->
+        <a href="students.html" class="index-card">
+            <div class="index-card-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
             <h2>Quản lý Sinh viên</h2>
-            <p>Thêm, sửa, xóa và tra cứu thông tin sinh viên</p>
-            <span class="badge">:9001</span>
+            <p>Thông tin và hồ sơ</p>
         </a>
 
-        <a href="theses.html" class="home-card">
-            <div class="home-card-icon">📚</div>
+        <!-- QUẢN LÝ ĐỀ TÀI -->
+        <a href="theses.html" class="index-card">
+            <div class="index-card-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                </svg>
+            </div>
             <h2>Quản lý Đề tài</h2>
-            <p>Thêm, sửa, xóa và tra cứu đề tài tốt nghiệp</p>
-            <span class="badge">:9002</span>
+            <p>Danh mục đề tài</p>
         </a>
 
-        <a href="registrations.html" class="home-card">
-            <div class="home-card-icon">📝</div>
+        <!-- ĐĂNG KÝ ĐỀ TÀI -->
+        <a href="registrations.html" class="index-card">
+            <div class="index-card-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+            </div>
             <h2>Đăng ký Đề tài</h2>
-            <p>Đăng ký và hủy đăng ký đề tài cho sinh viên</p>
-            <span class="badge">:9003</span>
+            <p>Thực hiện đăng ký</p>
         </a>
 
-    </main>
+    </div>
 
 </body>
 </html>
