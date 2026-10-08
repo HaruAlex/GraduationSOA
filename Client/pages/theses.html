@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đề tài</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">← Trang chủ</a>
+        <h1>Quản lý Đề tài</h1>
+    </header>
+
+    <div class="page-body">
+        <!-- SEARCH BAR -->
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo mã đề tài, tên đề tài, giảng viên...">
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-bar">
+            <button class="btn btn-dark" onclick="openAddModal()">+ Thêm</button>
+            <button class="btn btn-dark" onclick="openEditModal()">✏️ Sửa</button>
+            <button class="btn btn-dark" onclick="exportData()">📄 Tải danh sách</button>
+            <button class="btn btn-red" onclick="deleteSelected()">Xóa</button>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+            <div class="table-header">
+                <span>📚</span>
+                <span id="countLabel">Đã tải 0 đề tài</span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="center"><input type="checkbox" id="checkAll" onchange="toggleAllCheckboxes()"></th>
+                        <th>Mã ĐT</th>
+                        <th>Tên đề tài</th>
+                        <th>Giảng viên</th>
+                        <th class="center">Số lượng tối đa</th>
+                        <th class="center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="6" class="empty-row">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+
+            <!-- PAGINATION -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- MODAL THÊM/SỬA -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitle">Thêm đề tài</h2>
+            <div class="modal-field">
+                <label>Mã đề tài *</label>
+                <input type="text" id="modalMaDT" placeholder="VD: DT001">
+            </div>
+            <div class="modal-field">
+                <label>Tên đề tài *</label>
+                <input type="text" id="modalTenDT" placeholder="VD: Hệ thống quản lý...">
+            </div>
+            <div class="modal-field">
+                <label>Giảng viên</label>
+                <input type="text" id="modalGiangVien" placeholder="VD: Nguyễn Văn A">
+            </div>
+            <div class="modal-field">
+                <label>Số lượng tối đa *</label>
+                <input type="number" id="modalSoLuong" placeholder="VD: 5" min="1">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+                <button class="btn btn-dark" onclick="submitModal()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/theses.js"></script>
+
+</body>
+</html>
