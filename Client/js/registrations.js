@@ -7,13 +7,13 @@ let currentPage = 1;
 const rowsPerPage = 15;
 
 // ===== LOAD DATA =====
-async function loadData() {
+async function loadData(showNotify = true) {
     try {
         const result = await apiRequest(API, 'GET');
         if (result.ok) {
             allData = result.data;
             filterData();
-            showToast(`Đã tải ${result.data.length} đăng ký`, 'success');
+            if (showNotify) showToast(`Đã tải ${result.data.length} đăng ký`, 'success');
         }
     } catch (err) {
         console.error(err);
@@ -123,3 +123,58 @@ function exportData() {
 // ===== INIT =====
 document.getElementById('searchInput').addEventListener('input', filterData);
 loadData();
+
+// ===== IMPORT CSV =====
+// Định dạng CSV: MaSV,MaDT
+// Dòng đầu là header, bỏ qua khi import
+
+function triggerImport() {
+    const input = document.getElementById('importFileInput');
+    input.value = '';
+    input.click();
+}
+
+async function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    let items;
+    try {
+        items = await parseSpreadsheet(file, cols => {
+            // cols: [MaSV, MaDT]
+            const maSV = (cols[0] || '').trim();
+            const maDT = (cols[1] || '').trim();
+
+            if (!maSV || !maDT) return null;
+            return { maSV, maDT };
+        });
+    } catch (err) {
+        showToast('Lỗi đọc file: ' + err, 'error');
+        return;
+    }
+
+    if (items.length === 0) {
+        showToast('Không có dòng dữ liệu hợp lệ trong file CSV', 'error');
+        return;
+    }
+
+    showToast(`Đang import ${items.length} đăng ký...`, 'info');
+
+    const { success, failed, errors } = await importToAPI(API, items);
+
+    console.log('[Import debug] success:', success, 'failed:', failed, 'errors:', errors);
+
+    await loadData(false);
+
+    if (failed === 0) {
+        showToast(`Import thành công ${success} đăng ký`, 'success');
+        showImportErrors([], 'đăng ký');
+    } else {
+        showToast(`Import: ${success} thành công, ${failed} thất bại`, 'error');
+        showImportErrors(errors, 'đăng ký');
+        const detail = errors.map(({ index, item, message }) =>
+            `Dòng ${index} [SV: ${item.maSV} → ĐT: ${item.maDT}]: ${message}`
+        ).join('\n');
+        alert(`Kết quả import đăng ký:\n✔ Thành công: ${success}\n✘ Thất bại: ${failed}\n\nChi tiết lỗi:\n${detail}`);
+    }
+}

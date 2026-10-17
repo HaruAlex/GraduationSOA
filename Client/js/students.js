@@ -9,13 +9,13 @@ let modalMode = 'add';
 let editingId = null;
 
 // ===== LOAD DATA =====
-async function loadData() {
+async function loadData(showNotify = true) {
     try {
         const result = await apiRequest(API, 'GET');
         if (result.ok) {
             allData = result.data;
             filterData();
-            showToast(`Đã tải ${result.data.length} sinh viên`, 'success');
+            if (showNotify) showToast(`Đã tải ${result.data.length} sinh viên`, 'success');
         }
     } catch (err) {
         console.error(err);
@@ -169,3 +169,58 @@ function exportData() {
 // ===== INIT =====
 document.getElementById('searchInput').addEventListener('input', filterData);
 loadData();
+
+// ===== IMPORT CSV =====
+// Định dạng CSV: MaSV,HoTen,Email,Lop
+// Dòng đầu là header, bỏ qua khi import
+
+function triggerImport() {
+    const input = document.getElementById('importFileInput');
+    input.value = ''; // reset để chọn lại cùng file vẫn trigger
+    input.click();
+}
+
+async function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    let items;
+    try {
+        items = await parseSpreadsheet(file, cols => {
+            // cols: [MaSV, HoTen, Email, Lop]
+            const maSV  = (cols[0] || '').trim();
+            const hoTen = (cols[1] || '').trim();
+            const email = (cols[2] || '').trim();
+            const lop   = (cols[3] || '').trim();
+
+            if (!maSV || !hoTen) return null; // bỏ qua dòng thiếu bắt buộc
+            return { maSV, hoTen, email, lop };
+        });
+    } catch (err) {
+        showToast('Lỗi đọc file: ' + err, 'error');
+        return;
+    }
+
+    if (items.length === 0) {
+        showToast('Không có dòng dữ liệu hợp lệ trong file CSV', 'error');
+        return;
+    }
+
+    showToast(`Đang import ${items.length} sinh viên...`, 'info');
+
+    const { success, failed, errors } = await importToAPI(API, items);
+
+    await loadData(false);
+
+    if (failed === 0) {
+        showToast(`Import thành công ${success} sinh viên`, 'success');
+        showImportErrors([], 'sinh viên');
+    } else {
+        showToast(`Import: ${success} thành công, ${failed} thất bại`, 'error');
+        showImportErrors(errors, 'sinh viên');
+        const detail = errors.map(({ index, item, message }) =>
+            `Dòng ${index} [${item.maSV} - ${item.hoTen}]: ${message}`
+        ).join('\n');
+        alert(`Kết quả import sinh viên:\n✔ Thành công: ${success}\n✘ Thất bại: ${failed}\n\nChi tiết lỗi:\n${detail}`);
+    }
+}
