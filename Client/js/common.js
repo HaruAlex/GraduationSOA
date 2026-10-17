@@ -237,3 +237,123 @@ function validateRequired(fields) {
     }
     return true;
 }
+
+// ===== IMPORT SPREADSHEET (xlsx / xls / csv) via SheetJS =====
+
+/**
+ * Đọc file Excel (.xlsx, .xls) hoặc CSV, bỏ header dòng đầu, trả về mảng object.
+ * mapFn(row: string[]) => object | null  — trả null để bỏ qua dòng không hợp lệ
+ * Yêu cầu SheetJS (XLSX) đã được load trước common.js.
+ */
+function parseSpreadsheet(file, mapFn) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = e => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                // Lấy sheet đầu tiên
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+
+                // Chuyển sheet thành mảng mảng (header_row=0, defval='')
+                const rows = XLSX.utils.sheet_to_json(sheet, {
+                    header: 1,
+                    defval: ''
+                });
+
+                if (rows.length < 2) {
+                    reject('File không có dữ liệu (cần ít nhất 1 dòng header + 1 dòng dữ liệu)');
+                    return;
+                }
+
+                // Bỏ dòng header (index 0), map từng dòng thành object
+                const objects = rows
+                    .slice(1)
+                    .map(row => row.map(cell => String(cell === null || cell === undefined ? '' : cell).trim()))
+                    .map(mapFn)
+                    .filter(o => o !== null);
+
+                resolve(objects);
+            } catch (err) {
+                reject('Không thể đọc file: ' + err.message);
+            }
+        };
+
+        reader.onerror = () => reject('Không thể đọc file');
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+/**
+ * Gửi từng object trong mảng lên API bằng POST.
+ * Trả về { success, failed, errors } trong đó errors là mảng
+ * { index, message } để biết dòng nào lỗi và lý do.
+ *
+ * @param {string} api   - Base URL của API endpoint
+ * @param {Array}  items - Mảng object cần gửi
+ * @returns {Promise<{success: number, failed: number, errors: Array}>}
+ */
+async function importToAPI(api, items) {
+    let success = 0, failed = 0;
+    const errors = [];
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        try {
+            const result = await apiRequest(api, 'POST', item);
+            if (result.status === 201 || result.ok) {
+                success++;
+            } else {
+                failed++;
+                const message = result.data?.message
+                    || result.data?.error
+                    || ('HTTP ' + result.status);
+                errors.push({ index: i + 2, item, message }); // +2 vì dòng 1 là header
+            }
+        } catch (err) {
+            failed++;
+            errors.push({ index: i + 2, item, message: err.message });
+        }
+    }
+
+    return { success, failed, errors };
+}
+
+/**
+ * Hiển thị panel lỗi import ngay trên trang (bên dưới action-bar).
+ * Panel có nút đóng ×. Nếu errors rỗng thì ẩn panel.
+ *
+ * @param {Array}  errors     - Mảng { index, message } từ importToAPI
+ * @param {string} entityName - Tên thực thể để hiển thị tiêu đề
+ */
+function showImportErrors(errors, entityName) {
+    const panel = document.getElementById('importErrorPanel');
+    if (!panel) return;
+
+    if (!errors || errors.length === 0) {
+        panel.style.display = 'none';
+        return;
+    }
+
+    const rows = errors.map(({ index, message }) => `
+        <tr>
+            <td class="err-row-num">Dòng ${index}</td>
+            <td class="err-row-msg">${escHtml(message)}</td>
+        </tr>
+    `).join('');
+
+    panel.innerHTML = `
+        <div class="import-error-header">
+            <span>⚠️ ${errors.length} dòng thất bại khi import ${entityName}</span>
+            <button class="import-error-close" onclick="document.getElementById('importErrorPanel').style.display='none'">✕</button>
+        </div>
+        <table class="import-error-table">
+            <thead><tr><th>Dòng</th><th>Lý do</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+    panel.style.display = 'block';
+}

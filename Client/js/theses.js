@@ -9,13 +9,13 @@ let modalMode = 'add';
 let editingId = null;
 
 // ===== LOAD DATA =====
-async function loadData() {
+async function loadData(showNotify = true) {
     try {
         const result = await apiRequest(API, 'GET');
         if (result.ok) {
             allData = result.data;
             filterData();
-            showToast(`Đã tải ${result.data.length} đề tài`, 'success');
+            if (showNotify) showToast(`Đã tải ${result.data.length} đề tài`, 'success');
         }
     } catch (err) {
         console.error(err);
@@ -174,3 +174,58 @@ function exportData() {
 // ===== INIT =====
 document.getElementById('searchInput').addEventListener('input', filterData);
 loadData();
+
+// ===== IMPORT CSV =====
+// Định dạng CSV: MaDT,TenDT,GiangVien,SoLuongToiDa
+// Dòng đầu là header, bỏ qua khi import
+
+function triggerImport() {
+    const input = document.getElementById('importFileInput');
+    input.value = '';
+    input.click();
+}
+
+async function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    let items;
+    try {
+        items = await parseSpreadsheet(file, cols => {
+            // cols: [MaDT, TenDT, GiangVien, SoLuongToiDa]
+            const maDT         = (cols[0] || '').trim();
+            const tenDT        = (cols[1] || '').trim();
+            const giangVien    = (cols[2] || '').trim();
+            const soLuongToiDa = parseInt(cols[3]) || 0;
+
+            if (!maDT || !tenDT || soLuongToiDa <= 0) return null;
+            return { maDT, tenDT, giangVien, soLuongToiDa };
+        });
+    } catch (err) {
+        showToast('Lỗi đọc file: ' + err, 'error');
+        return;
+    }
+
+    if (items.length === 0) {
+        showToast('Không có dòng dữ liệu hợp lệ trong file CSV', 'error');
+        return;
+    }
+
+    showToast(`Đang import ${items.length} đề tài...`, 'info');
+
+    const { success, failed, errors } = await importToAPI(API, items);
+
+    await loadData(false);
+
+    if (failed === 0) {
+        showToast(`Import thành công ${success} đề tài`, 'success');
+        showImportErrors([], 'đề tài');
+    } else {
+        showToast(`Import: ${success} thành công, ${failed} thất bại`, 'error');
+        showImportErrors(errors, 'đề tài');
+        const detail = errors.map(({ index, item, message }) =>
+            `Dòng ${index} [${item.maDT} - ${item.tenDT}]: ${message}`
+        ).join('\n');
+        alert(`Kết quả import đề tài:\n✔ Thành công: ${success}\n✘ Thất bại: ${failed}\n\nChi tiết lỗi:\n${detail}`);
+    }
+}

@@ -25,8 +25,14 @@
             <button class="btn btn-dark" onclick="openAddModal()">+ Thêm</button>
             <button class="btn btn-dark" onclick="openEditModal()">✏️ Sửa</button>
             <button class="btn btn-dark" onclick="exportData()">📄 Tải danh sách</button>
+            <button class="btn btn-dark" onclick="triggerImport()">📥 Import CSV</button>
             <button class="btn btn-red" onclick="deleteSelected()">Xóa</button>
         </div>
+        <!-- INPUT FILE ẨN -->
+        <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImport(event)">
+
+        <!-- IMPORT ERROR PANEL -->
+        <div id="importErrorPanel"></div>
 
         <!-- TABLE CARD -->
         <div class="table-card">
@@ -86,6 +92,7 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="../js/common.js"></script>
     <script src="../js/students.js"></script>
 

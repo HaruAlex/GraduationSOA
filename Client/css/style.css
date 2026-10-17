@@ -316,3 +316,67 @@ td input[type="checkbox"], th input[type="checkbox"] {
     .action-bar { flex-wrap: wrap; }
     th, td { padding: 9px 10px; font-size: 13px; }
 }
+
+/* ===== IMPORT ERROR PANEL ===== */
+#importErrorPanel {
+    display: none;
+    background: #fff5f5;
+    border: 1.5px solid #fca5a5;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.import-error-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fee2e2;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+.import-error-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #b91c1c;
+    padding: 0 4px;
+    line-height: 1;
+}
+.import-error-close:hover { color: #7f1d1d; }
+
+.import-error-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.import-error-table thead tr {
+    background: #fee2e2;
+    border-top: 1px solid #fca5a5;
+}
+.import-error-table th {
+    padding: 8px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fee2e2;
+}
+.import-error-table tbody tr {
+    border-top: 1px solid #fecaca;
+}
+.import-error-table tbody tr:hover { background: #fef2f2; }
+.err-row-num {
+    padding: 7px 16px;
+    color: #dc2626;
+    font-weight: 600;
+    white-space: nowrap;
+    width: 80px;
+}
+.err-row-msg {
+    padding: 7px 16px;
+    color: #374151;
+}
